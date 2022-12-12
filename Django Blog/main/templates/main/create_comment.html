@@ -1,0 +1,10 @@
+{% extends 'index.html' %} {% block content %}
+
+<form method="POST" class="createPost_container">
+  {% csrf_token %}
+  <label class="input_label" for="comment_content">Comment Content</label>
+  <textarea class="create_textarea" cols="30" rows="10" name="comment_content"></textarea>
+  <button class="create_button" type="submit">Create</button>
+</form>
+
+{% endblock content %}

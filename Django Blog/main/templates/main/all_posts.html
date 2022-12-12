@@ -1,0 +1,41 @@
+{% extends 'index.html' %} {% load static %} {% block content %}
+
+<section class="allPosts_container">
+  {% if not all_posts %}
+  <h1 class="allPosts_heading">No posts found.</h1>
+  {% else %} {% for post in all_posts %}
+  <div class="post_wrapper">
+    <div class="heading_wrapper">
+      <span class="post_title">{{post.post_title}}</span>
+      <span class="post_author">By {{post.post_author}}</span>
+      <span class="post_date">{{post.created_at|timesince}} ago.</span>
+    </div>
+    <p class="post_content">{{post.post_content}}</p>
+    <div class="like_wrapper">
+      <a href="{% url 'like-post' post.id %}">
+        {% if user in post.post_likes.all %}
+        <img class="heart_logo liked" src="{% static 'images/heart.svg' %}" alt="heart-logo" />
+        {% else %}
+        <img class="heart_logo unliked" src="{% static 'images/heart.svg' %}" alt="heart-logo" />
+        {% endif %}
+      </a>
+      <span class="like_count">{{post.post_likes.all.count}}</span>
+      <a class="comment_text" href="{% url 'create-comment' post.id %}">Comment</a>
+      <div class="postAuthor_actions">
+        <a href="{% url 'comments' post.id %}">
+          <img class="comment_logo" src="{% static 'images/comment.svg' %}" alt="comment-logo" />
+        </a>
+        {% if user == post.post_author %}
+        <a href="{% url 'update-post' post.id %}">
+          <img class="update_logo" src="{% static 'images/update.svg' %}" alt="update-logo" /></a
+        ><a href="{% url 'delete-post' post.id %}">
+          <img class="delete_logo" src="{% static 'images/trash.svg' %}" alt="delete-logo" />
+        </a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  {% endfor %} {% endif %}
+</section>
+
+{% endblock %}

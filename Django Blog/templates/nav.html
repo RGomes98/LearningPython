@@ -1,0 +1,18 @@
+<nav class="nav_container">
+  <ul class="list_wrapper">
+    {% if request.user.is_authenticated %}
+    <div class="main_links">
+      <li><a href="{% url 'home' %}">HOME</a></li>
+      <li><a href="{% url 'all-posts' %}">POSTS</a></li>
+      <li><a href="{% url 'create-post' %}">CREATE POST</a></li>
+    </div>
+    <li class="logout"><a href="{% url 'logout' %}">LOGOUT</a></li>
+    {% else %}
+    <div class="loggedOut_links">
+      <li><a href="{% url 'home' %}">HOME</a></li>
+      <li><a href="{% url 'login' %}">LOGIN</a></li>
+      <li><a href="{% url 'register' %}">REGISTER</a></li>
+    </div>
+    {% endif %}
+  </ul>
+</nav>

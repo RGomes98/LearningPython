@@ -1,0 +1,10 @@
+{% extends 'index.html' %} {% block content %}
+
+<div class="home_container">
+  <h1>Django Blog</h1>
+  {% if request.user.is_authenticated %}
+  <p>Welcome {{request.user.username}}.</p>
+  {% endif %}
+</div>
+
+{% endblock %}
