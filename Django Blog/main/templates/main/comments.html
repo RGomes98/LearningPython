@@ -1,4 +1,4 @@
-{% extends 'index.html' %} {% block content %}
+{% extends 'index.html' %} {% load static %} {% block content %}
 
 <section class="comments_container">
   {% if not post_comments %}
@@ -13,8 +13,15 @@
     {% for comment in post_comments %}
     <div class="comment_wrapper">
       <div class="comment_details">
-        <span class="comment_author">{{comment.commented_by}}</span>
-        <span class="comment_date">{{comment.created_at | timesince}} ago.</span>
+        <div class="details_wrapper">
+          <span class="comment_author">{{comment.commented_by}}</span>
+          <span class="comment_date">{{comment.created_at | timesince}} ago.</span>
+        </div>
+        {% if user == comment.commented_by %}
+        <a href="{% url 'delete-comment' comment.id %}">
+          <img class="delete_logo" src="{% static 'images/trash.svg' %}" alt="delete-logo" />
+        </a>
+        {% endif %}
       </div>
       <p class="comment_content">{{comment.comment_content}}</p>
     </div>

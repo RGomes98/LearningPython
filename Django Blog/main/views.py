@@ -70,7 +70,8 @@ def registerPage(request):
 
 @login_required(login_url="login")
 def allPostsPage(request):
-    all_posts = Post.objects.annotate(number_of_comments=Count("comment"))
+    all_posts = Post.objects.annotate(number_of_comments=Count("comment")).order_by("created_at")
+
     context = {"all_posts": all_posts}
     return render(request, "main/all_posts.html", context)
 
@@ -156,7 +157,21 @@ def updatePostPage(request, id):
 
 
 @login_required(login_url="login")
-def createComment(request, id):
+def deleteComment(request, id):
+    try:
+        delete_comment = Comment.objects.get(id=id)
+    except:
+        return render(request, "main/error.html", {"error_message": "Not found"})
+
+    if delete_comment.commented_by.username != str(request.user):
+        return render(request, "main/error.html", {"error_message": "Unauthorized"})
+
+    delete_comment.delete()
+    return redirect("all-posts")
+
+
+@login_required(login_url="login")
+def createCommentPage(request, id):
     commented_by = request.user
 
     try:

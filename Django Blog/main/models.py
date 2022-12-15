@@ -14,9 +14,6 @@ class Post(models.Model):
     def __str__(self):
         return self.post_title
 
-    class Meta:
-        ordering = ["-created_at"]
-
 
 class Comment(models.Model):
     comment_content = models.TextField()

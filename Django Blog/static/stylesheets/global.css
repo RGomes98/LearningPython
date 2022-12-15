@@ -388,6 +388,11 @@ body {
 .comment_details {
   display: flex;
   margin-bottom: 0.6rem;
+  justify-content: space-between;
+}
+
+.details_wrapper {
+  display: flex;
   flex-direction: column;
 }
 
