@@ -27,6 +27,9 @@ class Comment(models.Model):
     def __str__(self):
         return self.comment_content
 
+    class Meta:
+        ordering = ["-created_at"]
+
 
 class Like(models.Model):
     liked_by = models.ForeignKey(User, on_delete=models.CASCADE)

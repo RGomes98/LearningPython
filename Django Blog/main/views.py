@@ -1,3 +1,4 @@
+from django.db.models import Count
 from .models import Post, Comment, User
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login
@@ -22,12 +23,12 @@ def loginPage(request):
         except:
             return render(request, "main/error.html", {"error_message": "Wrong credentials"})
 
-        is_authenticated = authenticate(request, username=username, password=password)
+        user_session = authenticate(request, username=username, password=password)
 
-        if is_authenticated is None:
+        if user_session is None:
             return render(request, "main/error.html", {"error_message": "Wrong credentials"})
         else:
-            login(request, is_authenticated)
+            login(request, user_session)
             return redirect("home")
 
     return render(request, "main/login.html", {})
@@ -47,22 +48,29 @@ def registerPage(request):
         username = request.POST.get("username")
         password = request.POST.get("password")
 
-        user_email = User.objects.filter(email=email).first()
-        user_name = User.objects.filter(username=username).first()
+        registered_email = User.objects.filter(email=email).first()
+        registered_username = User.objects.filter(username=username).first()
 
-        if user_name is None and user_email is None:
-            new_user = User.objects.create_user(username=username, password=password, email=email)
-            new_user.save()
-            return redirect("login")
+        if email and username and password:
+            if registered_email is None and registered_username is None:
+                new_user = User.objects.create_user(
+                    username=username, password=password, email=email
+                )
+                new_user.save()
+                return redirect("login")
+            else:
+                return render(
+                    request, "main/error.html", {"error_message": "User already registered"}
+                )
         else:
-            return render(request, "main/error.html", {"error_message": "User already registered"})
+            return render(request, "main/error.html", {"error_message": "All fields are required"})
 
     return render(request, "main/register.html", {})
 
 
 @login_required(login_url="login")
 def allPostsPage(request):
-    all_posts = Post.objects.all()
+    all_posts = Post.objects.annotate(number_of_comments=Count("comment"))
     context = {"all_posts": all_posts}
     return render(request, "main/all_posts.html", context)
 

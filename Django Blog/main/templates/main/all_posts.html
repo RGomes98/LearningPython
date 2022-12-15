@@ -11,17 +11,28 @@
       <span class="post_date">{{post.created_at|timesince}} ago.</span>
     </div>
     <p class="post_content">{{post.post_content}}</p>
-    <div class="like_wrapper">
-      <a href="{% url 'like-post' post.id %}">
-        {% if user in post.post_likes.all %}
-        <img class="heart_logo liked" src="{% static 'images/heart.svg' %}" alt="heart-logo" />
-        {% else %}
-        <img class="heart_logo unliked" src="{% static 'images/heart.svg' %}" alt="heart-logo" />
-        {% endif %}
-      </a>
-      <span class="like_count">{{post.post_likes.all.count}}</span>
-      <a class="comment_text" href="{% url 'create-comment' post.id %}">Comment</a>
+    <div class="buttons_wrapper">
+      {% if post.post_likes.all.count == 0 %}
+      <span class="like_count">Like</span>
+      {% elif post.post_likes.all.count == 1 %}
+      <span class="like_count">{{post.post_likes.all.count}} Like</span>
+      {% else %}
+      <span class="like_count">{{post.post_likes.all.count}} Likes</span>
+      {% endif %} {% if post.number_of_comments == 0 %}
+      <span class="comment_count">Comment</span>
+      {% elif post.number_of_comments == 1 %}
+      <span class="comment_count">{{post.number_of_comments}} Comment</span>
+      {% else %}
+      <span class="comment_count">{{post.number_of_comments}} Comments</span>
+      {% endif %}
       <div class="postAuthor_actions">
+        <a href="{% url 'like-post' post.id %}">
+          {% if user in post.post_likes.all %}
+          <img class="heart_logo liked" src="{% static 'images/heart.svg' %}" alt="heart-logo" />
+          {% else %}
+          <img class="heart_logo unliked" src="{% static 'images/heart.svg' %}" alt="heart-logo" />
+          {% endif %}
+        </a>
         <a href="{% url 'comments' post.id %}">
           <img class="comment_logo" src="{% static 'images/comment.svg' %}" alt="comment-logo" />
         </a>
