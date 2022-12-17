@@ -2,6 +2,7 @@ from django.db.models import Count
 from .models import Post, Comment, User
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login
+from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login, logout, authenticate
 
@@ -40,32 +41,26 @@ def userLogout(request):
 
 
 def registerPage(request):
+    register_form = UserCreationForm()
+
     if request.user.is_authenticated:
         return redirect("home")
 
     if request.method == "POST":
-        email = request.POST.get("email")
-        username = request.POST.get("username")
-        password = request.POST.get("password")
+        new_user = UserCreationForm(request.POST)
 
-        registered_email = User.objects.filter(email=email).first()
-        registered_username = User.objects.filter(username=username).first()
-
-        if email and username and password:
-            if registered_email is None and registered_username is None:
-                new_user = User.objects.create_user(
-                    username=username, password=password, email=email
-                )
-                new_user.save()
-                return redirect("login")
-            else:
-                return render(
-                    request, "main/error.html", {"error_message": "User already registered"}
-                )
+        if new_user.is_valid():
+            new_user.save()
+            return redirect("login")
         else:
-            return render(request, "main/error.html", {"error_message": "All fields are required"})
+            return render(
+                request,
+                "main/error.html",
+                {"error_message": "An error ocurred during user registration"},
+            )
 
-    return render(request, "main/register.html", {})
+    context = {"register_form": register_form}
+    return render(request, "main/register.html", context)
 
 
 @login_required(login_url="login")

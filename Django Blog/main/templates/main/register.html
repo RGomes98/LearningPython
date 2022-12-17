@@ -3,12 +3,9 @@
 <form method="POST" class="form-wrapper">
   {% csrf_token %}
   <span>Register</span>
-  <label for="username">Username:</label>
-  <input type="text" name="username" />
-  <label for="email">Email:</label>
-  <input type="email" name="email" />
-  <label for="password">Password:</label>
-  <input type="password" name="password" />
+  {% for field in register_form %}
+  <span>{{field.label}}</span>
+  {{field}} {% endfor %}
   <button type="submit">Create Account</button>
 </form>
 
