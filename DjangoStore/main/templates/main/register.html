@@ -1,0 +1,12 @@
+{% extends 'index.html' %} {% block content %}
+<main class="form_container">
+  <form class="form_wrapper" method="POST">
+    {% csrf_token %}
+    <span class="form_heading">Register</span>
+    {% for field in register_form %}
+    <p class="form_label">{{field.label}}</p>
+    {{field}} {% endfor %}
+    <button class="form_button">Register</button>
+  </form>
+</main>
+{% endblock %}

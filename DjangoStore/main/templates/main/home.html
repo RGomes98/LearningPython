@@ -1,0 +1,20 @@
+{% extends 'index.html' %} {% load static %} {% block content %}
+<main class="home_container">
+  <section class="products_section">
+    {% for product in products_data %}
+    <div class="product_wrapper">
+      <img class="product_image" src="{{product.image}}" alt="{{product.title}}" />
+      <p class="product_name">{{product.title}}</p>
+      <div class="price_wrapper">
+        <span class="product_price">${{product.price}}</span>
+        <a class="product_add" href="{% url 'add-product' product.id %}">
+          <img class="cart_logo" src="{% static 'images/cart.svg' %}" alt="cart-logo" />
+          Add to Cart
+        </a>
+      </div>
+      <p class="product_details">{{product.description}}</p>
+    </div>
+    {% endfor %}
+  </section>
+</main>
+{% endblock %}

@@ -1,0 +1,45 @@
+{% extends 'index.html' %} {% load static %} {% block content %}
+<main class="cart_container">
+  {% if not cart_products %}
+  <h1 class="cart_products_heading">You have no products in your cart yet!</h1>
+  {% else %} {% if products_count >= 2 %}
+  <p class="cart_products_count">
+    You have <span class="count">{{products_count}}</span> products in your cart!
+  </p>
+  {% else %}
+  <p class="cart_products_count">
+    You have <span class="count">{{products_count}}</span> product in your cart!
+  </p>
+  {% endif %}
+  <a class="cart_checkout" href="{% url 'checkout' %}">Go To Checkout</a>
+  {% endif %}
+  <section class="cart_wrapper">
+    {% for product in cart_products %}
+    <div class="cart_product_wrapper">
+      <img class="cart_products_image" src="{{product.image}}" alt="{{product.name}}" />
+      <p class="cart_products_name">{{product.name}}</p>
+      <div class="actions_wrapper">
+        <a class="remove_link" href="{% url 'remove-quantity' product.id %}"
+          ><img class="remove_logo" src="{% static 'images/minus.svg' %}" alt="remove-logo" />
+        </a>
+        <div class="quantity_wrapper">
+          <span class="product_quantity"
+            >Qty: <span class="quantity_value">{{product.quantity}}</span></span
+          >
+          <span class="quantity_dash">-</span>
+          <span class="quantity_price"
+            >Price: <span class="quantity_value">${{product.price}}</span></span
+          >
+        </div>
+        <a class="add_link" href="{% url 'add-quantity' product.id %}">
+          <img class="add_logo" src="{% static 'images/plus.svg' %}" alt="add-logo" />
+        </a>
+      </div>
+      <a class="delete_link" href="{% url 'remove-product' product.id %}">
+        <img class="delete_logo" src="{% static 'images/trash.svg' %}" alt="delete-logo" />
+      </a>
+    </div>
+    {% endfor %}
+  </section>
+</main>
+{% endblock %}

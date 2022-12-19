@@ -1,0 +1,52 @@
+{% extends 'index.html' %} {% load static %} {% block content %}
+<main class="checkout_container">
+  <section class="checkout_wrapper">
+    <div class="checkout_heading_wrapper">
+      <p class="checkout_heading">In Your Cart</p>
+      <a class="edit_link" href="{% url 'cart' %}">Edit</a>
+    </div>
+    <div class="checkout_info_wrapper">
+      <div class="prices_wrapper">
+        <div class="subtotal_wrapper">
+          <span class="text">Subtotal</span>
+          <span class="value">${{subtotal}}</span>
+        </div>
+        <div class="shipping_wrapper">
+          <span class="text">Estimated Shipping</span>
+          <span class="value">${{shipping_price}}</span>
+        </div>
+        <div class="tax_wrapper">
+          <span class="text">Estimated Tax</span>
+          <span class="value">${{tax_price}}</span>
+        </div>
+        <div class="total_wrapper">
+          <span class="text">Total</span>
+          <span class="value">${{total_price}}</span>
+        </div>
+        <span class="checkout_arrive">Arrives By {{arrives_by}}</span>
+        <a class="finish_button" href="{% url 'finish-transaction' %}">Purchase</a>
+      </div>
+      <div class="checkout_products_wrapper">
+        {% for product in cart_products %}
+        <div class="checkout_product">
+          <img class="checkout_product_image" src="{{product.image}}" alt="{{product.name}}" />
+          <div class="checkout_product_info">
+            <span class="checkout_product_name">{{product.name}}</span>
+            <div class="checkout_product_price_wrapper">
+              <span class="checkout_product_quantity"
+                >Qty: <span class="quantity_value">{{product.quantity}}</span></span
+              >
+              <span class="price_wrapper_dash">-</span>
+              <span class="checkout_product_multiplied_price"
+                >Price: <span class="price_value">${{product.multiplied_price}}</span></span
+              >
+            </div>
+            <span class="checkout_product_price">${{product.price}}</span>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+</main>
+{% endblock %}
