@@ -1,11 +1,8 @@
-{% extends 'index.html' %} {% load static %} {% block content %}
+{% extends 'index.html' %} {% block content %}
 <main class="error_container">
   <section class="error_wrapper">
     <h1 class="error_heading">{{error_message}}</h1>
-    <a class="error_link" href="">
-      <img class="back_logo" src="" alt="back-logo" />
-      Go Back Home</a
-    >
+    <a class="error_link" href="{% url 'home' %}">Go Back Home</a>
   </section>
 </main>
 {% endblock %}

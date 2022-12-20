@@ -4,9 +4,9 @@
     {% csrf_token %}
     <span class="form_heading">Login</span>
     <p class="form_label">Username</p>
-    <input class="form_input" type="text" name="username" />
+    <input required class="form_input" type="text" name="username" />
     <p class="form_label">Password</p>
-    <input class="form_input" type="password" name="password" />
+    <input required class="form_input" type="password" name="password" />
     <button class="form_button">Login</button>
   </form>
 </main>

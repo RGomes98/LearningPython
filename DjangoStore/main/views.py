@@ -17,14 +17,14 @@ def registerPage(request):
     register_form = UserCreationForm()
 
     if user.is_authenticated:
-        redirect("home")
+        return redirect("home")
 
     if request.method == "POST":
         new_user = UserCreationForm(request.POST)
 
         if new_user.is_valid():
             new_user.save()
-            redirect("login")
+            return redirect("login")
         else:
             return render(request, "main/error.html", {"error_message": new_user.errors})
 
@@ -35,7 +35,7 @@ def loginPage(request):
     user = request.user
 
     if user.is_authenticated:
-        redirect("home")
+        return redirect("home")
 
     if request.method == "POST":
         username = request.POST["username"]
@@ -105,7 +105,7 @@ def checkoutPage(request):
     PURCHASE_TAX_AMMOUNT = 2
     SUBTOTAL = 0
 
-    cart_products = cart.product_set.all().order_by("-quantity")
+    cart_products = cart.product_set.all().order_by("-quantity", "-price")
 
     for i in range(len(cart_products)):
         cart_products[i].multiplied_price = cart_products[i].price * cart_products[i].quantity
@@ -207,12 +207,12 @@ def removeQuantity(request, id):
 def finishTransactionPage(request):
     try:
         cart_id = request.user.cart.id
-        cart = Product.objects.filter(belongs_to=cart_id)
+        cart_products = Product.objects.filter(belongs_to=cart_id)
     except:
         return redirect("home")
 
-    if cart.count():
-        cart.delete()
+    if cart_products.count():
+        cart_products.delete()
         return render(request, "main/finish.html", {})
     else:
         return redirect("cart")

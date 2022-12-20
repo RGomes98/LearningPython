@@ -1,11 +1,8 @@
-{% extends 'index.html' %} {% load static %} {% block content %}
+{% extends 'index.html' %} {% block content %}
 <main class="finish_container">
   <section class="finish_wrapper">
     <h1 class="finish_heading">Transaction Complete!</h1>
-    <a class="finish_link" href="{% url 'home' %}">
-      <img class="back_logo" src="" alt="back-logo" />
-      Go Back Home</a
-    >
+    <a class="finish_link" href="{% url 'home' %}">Go Back Home</a>
   </section>
 </main>
 {% endblock %}
