@@ -1,0 +1,33 @@
+{% extends 'index.html' %} {% block content %}
+<main class="history_container">
+  {% if not purchase_history %}
+  <h1 class="history_heading">You have no purchase history yet!</h1>
+  {% else %}
+  <section class="history_wrapper">
+    {% for cart in purchase_history %}
+    <div class="time_wrapper">
+      <span class="history_day">{{cart.purchased_at | date:"D, M d"}}</span>
+      <span class="history_dash">-</span>
+      <span class="history_time">{{cart.purchased_at | date:"f A"}}</span>
+    </div>
+    <div class="cart_history_wrapper">
+      {% for product in cart.products %}
+      <div class="history_product_wrapper">
+        <img class="product_history_image" src="{{product.image}}" alt="{{product.name}}" />
+        <div class="product_history_details_wrapper">
+          <span class="product_history_count"
+            ><span class="product_history_symbol">Qty: </span>{{product.quantity}}</span
+          >
+          <span class="product_history_price"
+            ><span class="product_history_symbol">Price: </span>${{product.price}}</span
+          >
+          <span class="product_history_name">{{product.name}}</span>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% endfor %}
+  </section>
+  {% endif %}
+</main>
+{% endblock %}

@@ -28,7 +28,8 @@
     </li>
   </ul>
   <span class="nav_message"
-    >Logged in as <span class="nav_message_user">{{user.username}}</span></span
+    >Logged in as
+    <a class="nav_message_user" href="{% url 'purchase-history' %}">{{user.username}}</a></span
   >
 </nav>
 {% endif %}

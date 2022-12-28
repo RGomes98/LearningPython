@@ -3,10 +3,12 @@ from django.db import models
 
 
 class Cart(models.Model):
-    owner = models.OneToOneField(User, on_delete=models.CASCADE)
+    is_purchased = models.BooleanField(default=False)
+    purchased_at = models.DateTimeField(auto_now=True)
+    owner = models.ForeignKey(User, on_delete=models.CASCADE)
 
     def __str__(self):
-        return f"{self.owner}"[0].upper() + f"{self.owner}'s Cart"[1:]
+        return f"{self.owner}"[0].upper() + f"{self.owner}'s Cart"[1:] + f" - Purchased: {self.is_purchased}"
 
 
 class Product(models.Model):

@@ -12,6 +12,7 @@ urlpatterns = [
     path("add-product/<int:id>/", views.addProduct, name="add-product"),
     path("add-quantity/<int:id>/", views.addQuantity, name="add-quantity"),
     path("remove-product/<int:id>/", views.removeProduct, name="remove-product"),
+    path("purchase-history/", views.purchaseHistoryPage, name="purchase-history"),
     path("remove-quantity/<int:id>/", views.removeQuantity, name="remove-quantity"),
     path("finish-transaction/", views.finishTransactionPage, name="finish-transaction"),
 ]
