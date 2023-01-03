@@ -58,15 +58,10 @@ def logoutUser(request):
 
 
 def homePage(request):
-    user = request.user
-
     try:
         products_data = requests.get("https://fakestoreapi.com/products").json()
     except:
         return render(request, "main/error.html", {"error_message": "FakeStoreAPI is down!"})
-
-    if user.is_authenticated:
-        Cart.objects.get_or_create(owner=user, is_purchased=False)
 
     return render(request, "main/home.html", {"products_data": products_data})
 
@@ -78,7 +73,7 @@ def cartPage(request):
     try:
         cart = Cart.objects.get(owner=user, is_purchased=False)
     except:
-        return redirect("home")
+        return render(request, "main/error.html", {"error_message": "Cart not found!"})
 
     cart_products = cart.product_set.all().order_by("-quantity", "-added_at")
     products_count = 0
@@ -98,7 +93,7 @@ def checkoutPage(request):
     try:
         cart = Cart.objects.get(owner=user, is_purchased=False)
     except:
-        return redirect("home")
+        return render(request, "main/error.html", {"error_message": "Cart not found!"})
 
     if not cart.product_set.all().count():
         return redirect("cart")
@@ -121,14 +116,14 @@ def checkoutPage(request):
 
     context = {"cart_products": cart_products, "arrives_by": ARRIVES_BY}
 
-    def format_to_currency(SUBTOTAL, SHIPPING_PRICE, TAX_PRICE, TOTAL_PRICE):
+    def float_to_currency(SUBTOTAL, SHIPPING_PRICE, TAX_PRICE, TOTAL_PRICE):
         local_variables = locals()
         for variable in local_variables:
             if isinstance(local_variables[variable], decimal.Decimal):
                 locale.setlocale(locale.LC_ALL, "en_US")
                 context[variable.lower()] = locale.format_string("%.2f", local_variables[variable], True)
 
-    format_to_currency(SUBTOTAL, SHIPPING_PRICE, TAX_PRICE, TOTAL_PRICE)
+    float_to_currency(SUBTOTAL, SHIPPING_PRICE, TAX_PRICE, TOTAL_PRICE)
 
     return render(request, "main/checkout.html", context)
 
@@ -141,7 +136,7 @@ def addProduct(request, id):
     try:
         cart_id = Cart.objects.get(owner=user, is_purchased=False).id
     except:
-        return redirect("home")
+        return render(request, "main/error.html", {"error_message": "Cart not found!"})
 
     try:
         selected_product = requests.get(f"https://fakestoreapi.com/products/{id}").json()
@@ -171,7 +166,7 @@ def removeProduct(request, id):
     try:
         cart_id = Cart.objects.get(owner=user, is_purchased=False).id
     except:
-        return redirect("home")
+        return render(request, "main/error.html", {"error_message": "Cart not found!"})
 
     try:
         product = Product.objects.get(id=id, belongs_to=cart_id)
@@ -190,7 +185,7 @@ def addQuantity(request, id):
     try:
         cart_id = Cart.objects.get(owner=user, is_purchased=False).id
     except:
-        return redirect("home")
+        return render(request, "main/error.html", {"error_message": "Cart not found!"})
 
     try:
         product = Product.objects.get(id=id, belongs_to=cart_id)
@@ -210,7 +205,7 @@ def removeQuantity(request, id):
     try:
         cart_id = Cart.objects.get(owner=user, is_purchased=False).id
     except:
-        return redirect("home")
+        return render(request, "main/error.html", {"error_message": "Cart not found!"})
 
     try:
         product = Product.objects.get(id=id, belongs_to=cart_id)
@@ -233,11 +228,12 @@ def finishTransactionPage(request):
     try:
         cart = Cart.objects.get(owner=user, is_purchased=False)
     except:
-        return redirect("home")
+        return render(request, "main/error.html", {"error_message": "Cart not found!"})
 
     if cart.product_set.all().count():
         cart.is_purchased = True
         cart.save()
+        Cart.objects.create(owner=user)
         return render(request, "main/finish.html", {})
     else:
         return redirect("cart")
