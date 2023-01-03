@@ -1,5 +1,5 @@
-from django.db.models import Count
-from .models import Post, Comment, User
+from django.urls import reverse
+from .models import Post, Comment
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.forms import UserCreationForm
@@ -12,22 +12,16 @@ def homePage(request):
 
 
 def loginPage(request):
-    if request.user.is_authenticated:
+    user = request.user
+
+    if user.is_authenticated:
         return redirect("home")
 
     if request.method == "POST":
-        username = request.POST.get("username")
-        password = request.POST.get("password")
-
-        try:
-            User.objects.get(username=username)
-        except:
-            return render(request, "main/error.html", {"error_message": "Wrong credentials"})
-
-        user_session = authenticate(request, username=username, password=password)
+        user_session = authenticate(request, username=request.POST["username"], password=request.POST["password"])
 
         if user_session is None:
-            return render(request, "main/error.html", {"error_message": "Wrong credentials"})
+            return render(request, "main/error.html", {"error_message": "Wrong credentials!"})
         else:
             login(request, user_session)
             return redirect("home")
@@ -41,9 +35,10 @@ def userLogout(request):
 
 
 def registerPage(request):
+    user = request.user
     register_form = UserCreationForm()
 
-    if request.user.is_authenticated:
+    if user.is_authenticated:
         return redirect("home")
 
     if request.method == "POST":
@@ -53,22 +48,21 @@ def registerPage(request):
             new_user.save()
             return redirect("login")
         else:
-            return render(
-                request,
-                "main/error.html",
-                {"error_message": "An error ocurred during user registration"},
-            )
+            return render(request, "main/error.html", {"error_message": new_user.errors})
 
-    context = {"register_form": register_form}
-    return render(request, "main/register.html", context)
+    return render(request, "main/register.html", {"register_form": register_form})
 
 
 @login_required(login_url="login")
 def allPostsPage(request):
-    all_posts = Post.objects.annotate(number_of_comments=Count("comment")).order_by("created_at")
+    all_posts = Post.objects.all().order_by("created_at")
 
-    context = {"all_posts": all_posts}
-    return render(request, "main/all_posts.html", context)
+    for post in all_posts:
+        post.liked_by = post.post_likes.all()
+        post.likes_count = post.post_likes.count()
+        post.comments_count = post.comment_set.all().count()
+
+    return render(request, "main/all_posts.html", {"all_posts": all_posts})
 
 
 @login_required(login_url="login")
@@ -78,7 +72,7 @@ def likePost(request, id):
     try:
         post = Post.objects.get(id=id)
     except:
-        return render(request, "main/error.html", {"error_message": "Not found"})
+        return render(request, "main/error.html", {"error_message": "Post not found!"})
 
     if user in post.post_likes.all():
         post.post_likes.remove(user)
@@ -90,16 +84,12 @@ def likePost(request, id):
 
 @login_required(login_url="login")
 def createPostPage(request):
-    post_author = request.user
+    user = request.user
 
     if request.method == "POST":
-        post_title = request.POST.get("post_title")
-        post_content = request.POST.get("post_content")
-
-        new_post = Post.objects.create(
-            post_title=post_title, post_content=post_content, post_author=post_author
+        Post.objects.create(
+            post_author=user, post_title=request.POST["post_title"], post_content=request.POST["post_content"]
         )
-        new_post.save()
         return redirect("all-posts")
 
     return render(request, "main/create_post.html", {})
@@ -110,22 +100,26 @@ def commentsPage(request, id):
     try:
         post = Post.objects.get(id=id)
     except:
-        return render(request, "main/error.html", {"error_message": "Not found"})
+        return render(request, "main/error.html", {"error_message": "Post not found!"})
 
-    post_comments = post.comment_set.all()
-    context = {"post": post, "post_comments": post_comments}
-    return render(request, "main/comments.html", context)
+    post.post_comments = post.comment_set.all().order_by("-created_at")
+
+    return render(request, "main/comments.html", {"post": post})
 
 
 @login_required(login_url="login")
 def deletePost(request, id):
+    user = str(request.user)
+
     try:
         post = Post.objects.get(id=id)
     except:
-        return render(request, "main/error.html", {"error_message": "Not found"})
+        return render(request, "main/error.html", {"error_message": "Post not found!"})
 
-    if post.post_author.username != str(request.user):
-        return render(request, "main/error.html", {"error_message": "Unauthorized"})
+    author = post.post_author.username
+
+    if author != user:
+        return render(request, "main/error.html", {"error_message": "Unauthorized!"})
     else:
         post.delete()
         return redirect("all-posts")
@@ -133,53 +127,56 @@ def deletePost(request, id):
 
 @login_required(login_url="login")
 def updatePostPage(request, id):
-    try:
-        update_post = Post.objects.get(id=id)
-    except:
-        return render(request, "main/error.html", {"error_message": "Not found"})
+    user = str(request.user)
 
-    if update_post.post_author.username != str(request.user):
-        return render(request, "main/error.html", {"error_message": "Unauthorized"})
+    try:
+        post = Post.objects.get(id=id)
+    except:
+        return render(request, "main/error.html", {"error_message": "Post not found!"})
+
+    author = post.post_author.username
+
+    if author != user:
+        return render(request, "main/error.html", {"error_message": "Unauthorized!"})
 
     if request.method == "POST":
-        post_title = request.POST.get("post_title")
-        post_content = request.POST.get("post_content")
-        Post.objects.filter(id=id).update(post_title=post_title, post_content=post_content)
+        post.post_title = request.POST["post_title"]
+        post.post_content = request.POST["post_content"]
+        post.save()
         return redirect("all-posts")
 
-    context = {"update_post": update_post}
-    return render(request, "main/update_post.html", context)
+    return render(request, "main/update_post.html", {"post": post})
 
 
 @login_required(login_url="login")
 def deleteComment(request, id):
+    user = str(request.user)
+
     try:
-        delete_comment = Comment.objects.get(id=id)
+        comment = Comment.objects.get(id=id)
     except:
-        return render(request, "main/error.html", {"error_message": "Not found"})
+        return render(request, "main/error.html", {"error_message": "Comment not found!"})
 
-    if delete_comment.commented_by.username != str(request.user):
-        return render(request, "main/error.html", {"error_message": "Unauthorized"})
+    author = comment.commented_by.username
 
-    delete_comment.delete()
-    return redirect("all-posts")
+    if author != user:
+        return render(request, "main/error.html", {"error_message": "Unauthorized!"})
+    else:
+        comment.delete()
+        return redirect(reverse("comments", args=[comment.commented_post.id]))
 
 
 @login_required(login_url="login")
 def createCommentPage(request, id):
-    commented_by = request.user
+    user = request.user
 
     try:
-        Post.objects.get(id=id)
+        post = Post.objects.get(id=id)
     except:
-        return render(request, "main/error.html", {"error_message": "Not found"})
+        return render(request, "main/error.html", {"error_message": "Post not found!"})
 
     if request.method == "POST":
-        comment_content = request.POST.get("comment_content")
-        created_post = Comment.objects.create(
-            comment_content=comment_content, commented_by=commented_by, commented_post_id=id
-        )
-        created_post.save()
-        return redirect("all-posts")
+        Comment.objects.create(commented_by=user, commented_post=post, comment_content=request.POST["comment_content"])
+        return redirect(reverse("comments", args=[id]))
 
     return render(request, "main/create_comment.html", {})

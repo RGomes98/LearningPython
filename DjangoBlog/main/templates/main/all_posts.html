@@ -12,22 +12,22 @@
     </div>
     <p class="post_content">{{post.post_content}}</p>
     <div class="buttons_wrapper">
-      {% if post.post_likes.all.count == 0 %}
+      {% if post.likes_count == 0 %}
       <span class="like_count">Like</span>
-      {% elif post.post_likes.all.count == 1 %}
-      <span class="like_count">{{post.post_likes.all.count}} Like</span>
+      {% elif post.likes_count == 1 %}
+      <span class="like_count">{{post.likes_count}} Like</span>
       {% else %}
-      <span class="like_count">{{post.post_likes.all.count}} Likes</span>
-      {% endif %} {% if post.number_of_comments == 0 %}
+      <span class="like_count">{{post.likes_count}} Likes</span>
+      {% endif %} {% if post.comments_count == 0 %}
       <span class="comment_count">Comment</span>
-      {% elif post.number_of_comments == 1 %}
-      <span class="comment_count">{{post.number_of_comments}} Comment</span>
+      {% elif post.comments_count == 1 %}
+      <span class="comment_count">{{post.comments_count}} Comment</span>
       {% else %}
-      <span class="comment_count">{{post.number_of_comments}} Comments</span>
+      <span class="comment_count">{{post.comments_count}} Comments</span>
       {% endif %}
       <div class="postAuthor_actions">
         <a href="{% url 'like-post' post.id %}">
-          {% if user in post.post_likes.all %}
+          {% if user in post.liked_by %}
           <img class="heart_logo liked" src="{% static 'images/heart.svg' %}" alt="heart-logo" />
           {% else %}
           <img class="heart_logo unliked" src="{% static 'images/heart.svg' %}" alt="heart-logo" />

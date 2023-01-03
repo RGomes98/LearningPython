@@ -6,9 +6,7 @@ class Post(models.Model):
     post_content = models.TextField()
     post_title = models.CharField(max_length=120)
     created_at = models.DateTimeField(auto_now_add=True)
-    post_author = models.ForeignKey(
-        User, default=None, on_delete=models.CASCADE, related_name="author"
-    )
+    post_author = models.ForeignKey(User, on_delete=models.CASCADE)
     post_likes = models.ManyToManyField(User, default=None, blank=True, related_name="likes")
 
     def __str__(self):
@@ -23,14 +21,3 @@ class Comment(models.Model):
 
     def __str__(self):
         return self.comment_content
-
-    class Meta:
-        ordering = ["-created_at"]
-
-
-class Like(models.Model):
-    liked_by = models.ForeignKey(User, on_delete=models.CASCADE)
-    liked_post = models.ForeignKey(Post, on_delete=models.CASCADE)
-
-    def __str__(self):
-        return f"Liked by {self.liked_by.username}"

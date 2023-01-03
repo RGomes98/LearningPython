@@ -3,10 +3,10 @@
 <form method="POST" class="createPost_container">
   {% csrf_token %}
   <label class="input_label" for="post_title">Post Title</label>
-  <input class="create_input" type="text" name="post_title" value="{{update_post.post_title}}" />
+  <input required class="create_input" type="text" name="post_title" value="{{post.post_title}}" />
   <label class="input_label" for="post_content">Post Content</label>
-  <textarea class="create_textarea" cols="30" rows="10" name="post_content">
-{{update_post.post_content}}</textarea
+  <textarea required class="create_textarea" cols="30" rows="10" name="post_content">
+{{post.post_content}}</textarea
   >
   <button class="create_button" type="submit">Update</button>
 </form>

@@ -1,7 +1,7 @@
 {% extends 'index.html' %} {% load static %} {% block content %}
 
 <section class="comments_container">
-  {% if not post_comments %}
+  {% if not post.post_comments %}
   <h1 class="allPosts_heading">No comments found.</h1>
   <a class="comment_text" href="{% url 'create-comment' post.id %}">Write a comment</a>
   {% else %}
@@ -10,7 +10,7 @@
   <p class="comments_postContent">{{post.post_content}}</p>
   <a class="comment_text" href="{% url 'create-comment' post.id %}">Write a comment</a>
   <section class="comments_section">
-    {% for comment in post_comments %}
+    {% for comment in post.post_comments %}
     <div class="comment_wrapper">
       <div class="comment_details">
         <div class="details_wrapper">
